@@ -1,0 +1,178 @@
+{% extends "index.html.twig" %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron">
+        <div class="j-container">
+            <div class="info">
+                <p class="date">{{ article.getSubmissionDate| date("D-M-Y H:i")}}</p>
+                <a class="author" href="{{ path('articles_byAuthor', {'id': article.author.id}) }}">{{ article.author.name }}</a>
+                <p class="votes" id="votes">{{ article.getRating }}</p>
+            </div>
+            <h1>ARTICLE TITLE</h1>
+            <hr class="my-4">
+            <p class="lead">{{ article.description }}</p>
+            <hr class="my-4">
+            <p class="lead">{{ article.content }}</p>
+            {% if article.imgPath %}
+                <img src="{{ asset(article.imgPath) }}">
+            {% endif %}
+            <p class="lead">
+            {% for item in article.relations %}
+                <a  class="author" href="{{ path('articles_byTag', {'name': item.tag.name}) }}">{{ item.tag.name }}</a>
+            {% endfor %}
+            </p>
+            <div class="rating">
+                <div class="stars">
+                    <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
+                    <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
+                    <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
+                    <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
+                    <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
+                </div>
+                <button type="button" class="btn btn-outline-light btn-lg" id="like">VOTE</button>
+            </div>
+            {% if article.edit == 1 %}
+                <button type="button" class="btn btn-outline-light btn-lg" id="edit">EDIT</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% if not related %}
+{% else %}
+    {% if related|length > 3%}
+        {% set start = 0 %}
+        {% set end = 2 %}
+        {% set actv = "active" %}
+        <div id="carouselRelatedArticles" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <!-- if is_mobile() %}
+                     for item in related %}
+                <div class="carousel-item { actv }}" data-interval="false">
+                    <div class="row card-wrapper justify-content-center">
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{ item.title }}</h5>
+                                        <p class="card-text">{ item.description }}</p>
+                                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                                    </div>
+                                </div>
+                            </div>
+                        endfor %}
+                 else %}-->
+                {% for i in 1..(related|length + 2)//3 %}
+                    <div class="carousel-item {{ actv }}" data-interval="false">
+                        <div class="row card-wrapper justify-content-center">
+                            {% for j in start..end%}
+                                <div class="col-lg-4 col-sm-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ related[j].title }}</h5>
+                                            <p class="card-text">{{ related[j].description }}</p>
+                                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        <!--     endif %}-->
+                        </div>
+                    </div>
+                    {% set start = start + 3 %}
+                    {% set actv = "" %}
+                    {% if loop.index + 1 == loop.length %}
+                        {% set end = end + related|length % 3 %}
+                    {% else %}
+                        {% set end = end + 3%}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <a class="carousel-control-prev" href="#carouselRelatedArticles" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselRelatedArticles" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    {% else %}
+        {% set start = 0 %}
+        {% set end = related|length - 1 %}
+        <div class="row card-wrapper justify-content-center">
+            {% for j in start..end%}
+                <div class="col-lg-4 col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ related[j].title }}</h5>
+                            <p class="card-text">{{ related[j].description }}</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endif %}
+</div>
+{% endblock %}
+{% block script %}
+    <script language="JavaScript">
+        $(document).ready(function(){
+            let userRating;
+            $(".rating input:radio").attr("checked", false);
+
+            $('.rating input').click(function () {
+                $(".rating span").removeClass('checked');
+                $(this).parent().addClass('checked');
+            });
+
+            $('input:radio').change(
+                function(){
+                    userRating = this.value;
+                    console.log(userRating);
+                });
+            $("#like").click(function () {
+                $.ajax({
+                    url: '{{ path('article-vote', {'id': article.id}) }}',
+                    type: "GET",
+                    data: {rating: userRating},
+                    dataType: "json",
+                    async: true,
+                    success: function (data) {
+                        console.log(data.data);
+                        if(data.data === "Already voted")
+                        {
+                            $("#like").html(data.data);
+                        }
+                        else {
+                            $("#votes").html(data.data);
+                        }
+                    }
+                })
+            })
+            })
+        $(document).ready(function () {
+            $("#edit").click( function () {
+                $.ajax({
+                    url: '{{ path('sendEmail', {'id': article.id}) }}',
+                    type: "GET",
+                    dataType: "json",
+                    async: true,
+                    success: function (data) {
+                        console.log(data.data);
+                        if(data.data === "Already sent an Email")
+                        {
+                            $("#edit").html(data.data);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.status);
+                        alert(errorThrown);
+                    }
+                })
+            })
+        })
+
+    </script>
+{% endblock %}

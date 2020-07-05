@@ -1,0 +1,20 @@
+{% extends "index.html.twig" %}
+
+{% block content %}
+    <div class="container">
+        <h1>TOP 10 INFLUENCERS</h1>
+        {% for author in authors %}
+            <div class="row card-wrapper justify-content-center">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ author.name }}</h5>
+                                <p class="card-text">{{ author.rating }}</p>
+                                <a href="#" class="btn btn-primary">VIEW ARTICLES</a>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -6,6 +6,8 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ArticleRepository")
@@ -22,26 +24,49 @@ class Article
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 100,
+     *      minMessage = "Your article's title must be at least {{ limit }} characters long",
+     *      maxMessage = "Your article's title cannot be longer than {{ limit }} characters",
+     *      allowEmptyString = false
+     * )
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\Length(
+     *      min = 50,
+     *      max = 500,
+     *      minMessage = "Your article's description must be at least {{ limit }} characters long",
+     *      maxMessage = "Your article's description cannot be longer than {{ limit }} characters",
+     *      allowEmptyString = false
+     * )
      */
     private $description;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\Length(
+     *      min = 500,
+     *      max = 10000,
+     *      minMessage = "Your article's content must be at least {{ limit }} characters long",
+     *      maxMessage = "Your article's content cannot be longer than {{ limit }} characters",
+     *      allowEmptyString = false
+     * )
      */
     private $content;
 
     /**
      * @ORM\Column(type="datetime")
+     *@Assert\DateTime
+     * @var string A "d-m-Y H:i:s" formatted value
      */
     private $submission_date;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $imgPath;
 
@@ -53,28 +78,60 @@ class Article
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Author", inversedBy="articles")
      */
-    private $author_id;
+    private $author;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\TagRelation", mappedBy="article_id")
+     * @ORM\OneToMany(targetEntity="App\Entity\TagRelation", mappedBy="article")
      */
     private $relations;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     *
+     * @Assert\Length(
+     *      min = 500,
+     *      max = 10000,
+     *      minMessage = "Your article's content must be at least {{ limit }} characters long",
+     *      maxMessage = "Your article's content cannot be longer than {{ limit }} characters",
+     *      allowEmptyString = false
+     * )
      */
     private $new_content;
 
     /**
+     * @ORM\Column(type="float")
+     */
+    private $rating;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $edit;
+
+    /**
+     * @return int
+     */
+    public function getEdit(): int
+    {
+        return $this->edit;
+    }
+
+    /**
+     * @param int $edit
+     */
+    public function setEdit(int $edit): void
+    {
+        $this->edit = $edit;
+    }
+
+    /**
      * Article constructor.
-     * @param $relations
      */
     public function __construct()
     {
-        $this->relations = new ArrayCollection();
+        $this->no_reviews = 0;
+        $this->rating = 0;
+        $this->edit = 1;
     }
-
 
     /**
      * @return mixed
@@ -175,17 +232,17 @@ class Article
     /**
      * @return mixed
      */
-    public function getAuthorId()
+    public function getAuthor()
     {
-        return $this->author_id;
+        return $this->author;
     }
 
     /**
-     * @param mixed $author_id
+     * @param mixed $author
      */
-    public function setAuthorId($author_id): void
+    public function setAuthor($author): void
     {
-        $this->author_id = $author_id;
+        $this->author = $author;
     }
 
     /**
@@ -204,5 +261,51 @@ class Article
         $this->imgPath = $imgPath;
     }
 
-    //Todo getter and setter
+
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+
+    /**
+     * @param ArrayCollection $relations
+     */
+    public function setRelations(ArrayCollection $relations): void
+    {
+        $this->relations = $relations;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNewContent()
+    {
+        return $this->new_content;
+    }
+
+    /**
+     * @param mixed $new_content
+     */
+    public function setNewContent($new_content): void
+    {
+        $this->new_content = $new_content;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRating()
+    {
+        return $this->rating;
+    }
+
+    /**
+     * @param mixed $rating
+     */
+    public function setRating($rating): void
+    {
+        $this->rating = $rating;
+    }
+
+
 }

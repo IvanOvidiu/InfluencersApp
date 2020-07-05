@@ -22,42 +22,59 @@ class TagRelation
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Article", inversedBy="relations")
      */
-    private $article_id;
+    private $article;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Tag", inversedBy="relations")
      */
-    private $tag_id;
+    private $tag;
 
     /**
      * @return mixed
      */
-    public function getArticleId()
+    public function getArticle()
     {
-        return $this->article_id;
+        return $this->article;
     }
 
     /**
-     * @param mixed $article_id
+     * @param mixed $article
      */
-    public function setArticleId($article_id): void
+    public function setArticle($article): void
     {
-        $this->article_id = $article_id;
+        $this->article = $article;
     }
 
     /**
      * @return mixed
      */
-    public function getTagId()
+    public function getTag()
     {
-        return $this->tag_id;
+        return $this->tag;
     }
 
     /**
-     * @param mixed $tag_id
+     * @param mixed $tag
      */
-    public function setTagId($tag_id): void
+    public function setTag($tag): void
     {
-        $this->tag_id = $tag_id;
+        $this->tag = $tag;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
+
 }

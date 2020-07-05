@@ -7,6 +7,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AuthorRepository")
@@ -24,11 +25,21 @@ class Author
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email."
+     * )
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * * @Assert\Length(
+     *      min = 3,
+     *      max = 50,
+     *      minMessage = "Your name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your name cannot be longer than {{ limit }} characters",
+     *      allowEmptyString = false
+     * )
      */
     private $name;
 
@@ -38,7 +49,7 @@ class Author
     private $rating;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="author_id")
+     * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="author")
      */
     private $articles;
 

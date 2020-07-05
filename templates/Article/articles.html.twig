@@ -1,0 +1,20 @@
+{% extends "index.html.twig" %}
+
+{% block content %}
+<div class="container">
+    {% for article in articles %}
+    <div class="jumbotron">
+        <div class="j-container">
+            <div class="info">
+                <p class="date">{{ article.getSubmissionDate| date("D-M-Y H:i")}}</p>
+                <a class="author" href="{{ path('articles_byAuthor', {'id': article.author.id}) }}">{{ article.author.name }}</a>
+            </div>
+            <h1>{{ article.title }}</h1>
+            <p class="lead">{{ article.description }}</p>
+            <a href="{{ path('read_article', {'id': article.id}) }}"><button type="button" class="btn btn-outline-light btn-lg">READ</button></a>
+            <a href="#"><button type="button" class="btn btn-outline-light btn-lg">LIKE</button></a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

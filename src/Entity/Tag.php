@@ -7,7 +7,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\TagRepository")
+ * @ORM\Entity()
  */
 
 class Tag
@@ -25,7 +25,7 @@ class Tag
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\TagRelation", mappedBy="tag_id")
+     * @ORM\OneToMany(targetEntity="App\Entity\TagRelation", mappedBy="tag")
      */
     private $relations;
 
@@ -67,17 +67,17 @@ class Tag
     }
 
     /**
-     * @return ArrayCollection
+     * @return Doctrine\Common\Collections\Collection
      */
-    public function getRelations(): ArrayCollection
+    public function getRelations()
     {
         return $this->relations;
     }
 
     /**
-     * @param ArrayCollection $relations
+     * @param Doctrine\Common\Collections\Collection $relations
      */
-    public function setRelations(ArrayCollection $relations): void
+    public function setRelations($relations)
     {
         $this->relations = $relations;
     }
