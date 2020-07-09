@@ -11,8 +11,8 @@
             </div>
             <h1>{{ article.title }}</h1>
             <p class="lead">{{ article.description }}</p>
-            <a href="{{ path('read_article', {'id': article.id}) }}"><button type="button" class="btn btn-outline-light btn-lg">READ</button></a>
-            <a href="#"><button type="button" class="btn btn-outline-light btn-lg">LIKE</button></a>
+            <a href="{{ path('read_article', {'id': article.id}) }}"><button type="button" class="btn btn-outline-light btn-lg button">READ</button></a>
+            <a href="#"><button type="button" class="btn btn-outline-light btn-lg button">LIKE</button></a>
         </div>
     </div>
     {% endfor %}

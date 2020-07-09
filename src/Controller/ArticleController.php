@@ -62,7 +62,7 @@ class ArticleController extends AbstractController
             if($imageFile)
             {
                 $imageFileName = $fileUploader->upload($imageFile);
-                $article->setImgPath('uploads/images'.$imageFileName);
+                $article->setImgPath('uploads/images/'.$imageFileName);
             }
 
             $author = $this->getDoctrine()->getRepository(Author::class)->checkAuthor($email);
@@ -199,6 +199,7 @@ class ArticleController extends AbstractController
      * @param MailerInterface $mailer
      * @param int $id
      * @throws \Exception
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      * @Route("/sendEmail/{id}", name="sendEmail")
      */
     public function sendEmail(Request $request, MailerInterface $mailer,int $id)
@@ -210,28 +211,42 @@ class ArticleController extends AbstractController
 
         if($request->isXmlHttpRequest())
         {
+            if($request->cookies->get('edit'.$id)) {
+                $response->setContent(json_encode([
+                    'data' => "A link was sent to you",
+                ]));
 
-            $article->setEdit(random_int(100, 2147483647));
-            $entityManager->persist($article);
-            $entityManager->flush();
+                return $response;
+            }
+            else {
 
-            $link = 'http://127.0.0.1:8000/edit/' . $article->getEdit() . '/' . $article->getId();
+                $cookie = new Cookie('edit'.$id, 'true', time() + (86400 * 120), '/sendEmail/'.$id);
+                $response->headers->setCookie($cookie);
 
-            $email = (new TemplatedEmail())
-                ->from('ovidiu.ivan98@gmail.com')
-                ->to($author->getEmail())
-                ->subject('Edit your article')
-                ->htmlTemplate('Emails/edit.html.twig')
-                ->context([
-                    'article' => $article,
-                    'editLink' => $link,
-                ]);
+                $article->setEdit(random_int(100, 2147483647));
+                $entityManager->persist($article);
+                $entityManager->flush();
 
-            $response->setContent(json_encode([
-                'data'=> "A link was sent to you"
-            ]));
+                $link = 'http://127.0.0.1:8000/edit/' . $article->getEdit() . '/' . $article->getId();
 
-            return $response;
+                $email = (new TemplatedEmail())
+                    ->from('ovidiu.ivan98@gmail.com')
+                    ->to($author->getEmail())
+                    ->subject('Edit your article')
+                    ->htmlTemplate('Emails/edit.html.twig')
+                    ->context([
+                        'article' => $article,
+                        'editLink' => $link,
+                    ]);
+
+                $mailer->send($email);
+
+                $response->setContent(json_encode([
+                    'data' => "A link was sent to you"
+                ]));
+
+                return $response;
+            }
         }
     }
 
@@ -246,26 +261,45 @@ class ArticleController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $article = $entityManager->getRepository(Article::class)->find($id);
 
+        $response = new Response();
+        $response->headers->clearCookie('edit'.$id, '/sendEmail/'.$id);
+
         if($tocken == $article->getEdit()){
             $form = $this->createForm(EditArticleType::class, $article);
-
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $article = $form->getData();
+                if($article->getEdit() == $tocken)
+                {
+                    $new_content = $form->get('newContent')->getData();
+                    $article->setContent($new_content);
 
-                $entityManager->persist($article);
-                $entityManager->flush();
+                    if($article->getNoReviews() == 0)
+                    {
+                        $article->setEdit(1);
+                    }
+                    else
+                    {
+                        $article->setEdit(0);
+                    }
 
-                return $this->redirectToRoute('read_article', array('id' => $article->getId()));
+                    $entityManager->persist($article);
+                    $entityManager->flush();
+
+                    return $this->redirectToRoute('read_article', array('id' => $article->getId()));
+                }
+                else
+                {
+                    $this->redirectToRoute('index_route');
+                }
             }
 
             return $this->render('Article/edit.html.twig', [
                 'form' => $form->createView(),
-            ]);
+            ], $response);
         }
         else{
-            return $this->render('index.html.twig');
+            return $this->redirectToRoute('index.html.twig');
         }
     }
 }

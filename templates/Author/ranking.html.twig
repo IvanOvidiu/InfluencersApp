@@ -2,15 +2,17 @@
 
 {% block content %}
     <div class="container">
-        <h1>TOP 10 INFLUENCERS</h1>
+        <div class="title">
+            <h1>TOP 10 INFLUENCERS</h1>
+        </div>
         {% for author in authors %}
             <div class="row card-wrapper justify-content-center">
-                    <div class="col">
-                        <div class="card">
+                    <div class="col-lg-6 col-sm-9">
+                        <div class="card ranking">
                             <div class="card-body">
                                 <h5 class="card-title">{{ author.name }}</h5>
                                 <p class="card-text">{{ author.rating }}</p>
-                                <a href="#" class="btn btn-primary">VIEW ARTICLES</a>
+                                <a href="{{ path('articles_byAuthor', {'id': author.id}) }}" class="btn btn-primary button">VIEW ARTICLES</a>
                             </div>
                         </div>
                     </div>

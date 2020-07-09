@@ -9,7 +9,7 @@
                 <a class="author" href="{{ path('articles_byAuthor', {'id': article.author.id}) }}">{{ article.author.name }}</a>
                 <p class="votes" id="votes">{{ article.getRating }}</p>
             </div>
-            <h1>ARTICLE TITLE</h1>
+            <h1>{{ article.title }}</h1>
             <hr class="my-4">
             <p class="lead">{{ article.description }}</p>
             <hr class="my-4">
@@ -30,10 +30,10 @@
                     <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
                     <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
                 </div>
-                <button type="button" class="btn btn-outline-light btn-lg" id="like">VOTE</button>
+                <button type="button" class="btn btn-outline-light btn-lg button" id="like">VOTE</button>
             </div>
             {% if article.edit == 1 %}
-                <button type="button" class="btn btn-outline-light btn-lg" id="edit">EDIT</button>
+                <button type="button" class="btn btn-outline-light btn-lg button" id="edit">EDIT</button>
             {% endif %}
         </div>
     </div>
@@ -70,7 +70,7 @@
                                         <div class="card-body">
                                             <h5 class="card-title">{{ related[j].title }}</h5>
                                             <p class="card-text">{{ related[j].description }}</p>
-                                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                                            <a href="{{ path('read_article', {'id': related[j].id}) }}" class="btn btn-primary button">READ ARTICLE</a>
                                         </div>
                                     </div>
                                 </div>
@@ -106,7 +106,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ related[j].title }}</h5>
                             <p class="card-text">{{ related[j].description }}</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            <a href="{{ path('article/{id}', {'id' : related[j].id}) }}" class="btn btn-primary button">READ ARTICLE</a>
                         </div>
                     </div>
                 </div>
@@ -148,11 +148,10 @@
                         else {
                             $("#votes").html(data.data);
                         }
+                        $("#edit").hide();
                     }
                 })
             })
-            })
-        $(document).ready(function () {
             $("#edit").click( function () {
                 $.ajax({
                     url: '{{ path('sendEmail', {'id': article.id}) }}',
@@ -161,12 +160,10 @@
                     async: true,
                     success: function (data) {
                         console.log(data.data);
-                        if(data.data === "Already sent an Email")
-                        {
-                            $("#edit").html(data.data);
-                        }
+                        $("#edit").html(data.data);
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textStatus, errorThrown, data) {
+                        console.log(data.data)
                         alert(jqXHR.status);
                         alert(errorThrown);
                     }

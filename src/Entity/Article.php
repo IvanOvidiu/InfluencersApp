@@ -92,7 +92,8 @@ class Article
      *      max = 10000,
      *      minMessage = "Your article's content must be at least {{ limit }} characters long",
      *      maxMessage = "Your article's content cannot be longer than {{ limit }} characters",
-     *      allowEmptyString = false
+     *      allowEmptyString = false,
+     *     groups={"edit"}
      * )
      */
     private $new_content;
